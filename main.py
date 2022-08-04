@@ -37,32 +37,43 @@ def choosing_action(message):
         spamming = types.KeyboardButton('Спам')
         markup.add(joke, spamming)
         bot.send_message(message.chat.id, 'Отлично! Настало время выбрать, чем я тебе могу помочь!',
-                            reply_markup=markup)
+                         reply_markup=markup)
         bot.register_next_step_handler(message, two_actions)
+
     else:
         bot.send_message(message.chat.id, 'Ну я же говорил, что я пока что глупенький и не понимаю человеческий язык! '
                                           'Нажми конпку "Да" внизу, чтобы начать!')
 
+
 @bot.message_handler(content_types=['text'])
 def two_actions(message):
-
     if message.text == 'Анекдот':
         bot.send_message(message.chat.id, 'Хочешь развлечься анекдотами? Напиши любую цифру от 1 до 9')
         bot.register_next_step_handler(message, jokes)
     elif message.text == 'Спам':
         spam_buttons(message)
         bot.register_next_step_handler(message, spam)
+
+
 @bot.message_handler(content_types=['text'])
 def jokes(message):
-
-    if message.text.lower() in '123456789':
-        bot.send_message(message.chat.id, list_of_jokes[0])
-        del list_of_jokes[0]
-        bot.register_next_step_handler(message, jokes)
+    markup = types.ReplyKeyboardMarkup()
+    if message.text == 'Назад':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+        ready = types.KeyboardButton('Да')
+        markup.add(ready)
+        bot.send_message(message.chat.id, 'Хороший выбор! Злодейству не бывать! Хочешь ещё вместе развлечься? Жми '
+                                          'скорее "ДА"!', reply_markup=markup)
     else:
-        bot.send_message(message.chat.id, 'Я просил написать цифру, а ты пытаешься меня сломать! '
+        if message.text.lower() in '123456789':
+            bot.send_message(message.chat.id, list_of_jokes[0])
+            del list_of_jokes[0]
+            bot.register_next_step_handler(message, jokes)
+        else:
+            bot.send_message(message.chat.id, 'Я просил написать цифру, а ты пытаешься меня сломать! '
                                               'Давай попробуем ещё раз! Напиши цифру от 1 до 9')
-        bot.register_next_step_handler(message, jokes)
+            bot.register_next_step_handler(message, jokes)
+
 
 @bot.message_handler(content_types=['text'])
 def spam_buttons(message):
@@ -81,19 +92,32 @@ def spam_buttons(message):
 
 def spam(message):
     markup = types.ReplyKeyboardMarkup()
-    for i in range(0, 10):
-        if message.text == 'Матвей':
-            bot.send_message(message.chat.id, '@DrFobosser, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Дима':
-            bot.send_message(message.chat.id, '@RuFuZZZ, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Вова':
-            bot.send_message(message.chat.id, '@JustSenseSeeker, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Вася':
-            bot.send_message(message.chat.id, '@codemdvd, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Прохор':
-            bot.send_message(message.chat.id, '@prokhorkotov, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Нет злодейству!':
-            bot.send_message(message.chat.id, 'Хороший выбор! Злодейству не бывать!', reply_markup=markup)
+    if message.text == 'Назад':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+        ready = types.KeyboardButton('Да')
+        markup.add(ready)
+        bot.send_message(message.chat.id, 'Хороший выбор! Злодейству не бывать! Хочешь ещё вместе развлечься? Жми '
+                                          'скорее "ДА"!', reply_markup=markup)
+    else:
+        for i in range(0, 10):
+            if message.text == 'Матвей':
+                bot.send_message(message.chat.id, '@DrFobosser, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Дима':
+                bot.send_message(message.chat.id, '@RuFuZZZ, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Вова':
+                bot.send_message(message.chat.id, '@JustSenseSeeker, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Вася':
+                bot.send_message(message.chat.id, '@codemdvd, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Прохор':
+                bot.send_message(message.chat.id, '@prokhorkotov, выйди на связь!', reply_markup=markup)
+
+
+# @bot.message_handler(content_types=['text'])
+# def sus_function(message):
+#     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+#     ready = types.KeyboardButton('Да')
+#     markup.add(ready)
+#     bot.send_message(message.chat.id, 'Хочешь ещё вместе развлечься? Жми скорее "ДА"!', reply_markup=markup)
 
 
 bot.polling(none_stop=True)
