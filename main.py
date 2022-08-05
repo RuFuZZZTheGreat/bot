@@ -48,23 +48,36 @@ def choosing_action(message):
 @bot.message_handler(content_types=['text'])
 def two_actions(message):
     if message.text == 'Анекдот':
-        bot.send_message(message.chat.id, 'Хочешь развлечься анекдотами? Напиши любую цифру от 1 до 9.')
-        bot.register_next_step_handler(message, jokes)
+        jokes_proc(message)
     elif message.text == 'Спам':
         spam_buttons(message)
         bot.register_next_step_handler(message, spam)
 
 
 @bot.message_handler(content_types=['text'])
+def jokes_proc(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+    joke = types.KeyboardButton('Загружай!')
+    back = types.KeyboardButton('Назад')
+    markup.add(joke, back)
+    bot.send_message(message.chat.id, 'Хочешь развлечься анекдотами?', reply_markup=markup)
+    bot.register_next_step_handler(message, pip)
+
+
+@bot.message_handler(content_types=['text'])
+def pip(message):
+    if message.text == 'Загружай!':
+        jokes(message)
+    elif message.text == 'Назад':
+        message.text = 'Да'
+        choosing_action(message)
+
+
+@bot.message_handler(content_types=['text'])
 def jokes(message):
-        if message.text.lower() in '123456789':
-            bot.send_message(message.chat.id, list_of_jokes[0])
-            del list_of_jokes[0]
-            bot.register_next_step_handler(message, jokes)
-        else:
-            bot.send_message(message.chat.id, 'Я просил написать цифру, а ты пытаешься меня сломать! '
-                                              'Давай попробуем ещё раз! Напиши цифру от 1 до 9')
-            bot.register_next_step_handler(message, jokes)
+    bot.send_message(message.chat.id, list_of_jokes[0])
+    del list_of_jokes[0]
+    jokes_proc(message)
 
 
 @bot.message_handler(content_types=['text'])
@@ -75,8 +88,8 @@ def spam_buttons(message):
     prokhor = types.KeyboardButton('Прохор')
     vasya = types.KeyboardButton('Вася')
     dima = types.KeyboardButton('Дима')
-    #back = types.KeyboardButton('Назад')
-    markup.add(matvey, vova, prokhor, vasya, dima)
+    back = types.KeyboardButton('Назад')
+    markup.add(matvey, vova, prokhor, vasya, dima, back)
 
     bot.send_message(message.chat.id, 'Кто-то не отвечает тебе? Давай разберёмся! Кто посмел тебя игнорировать? '
                                       'Выбирай скорее!', reply_markup=markup)
@@ -84,19 +97,21 @@ def spam_buttons(message):
 
 def spam(message):
     markup = types.ReplyKeyboardMarkup()
-    #if message.text == 'Назад':
+    if message.text == 'Назад':
+        message.text = 'Да'
+        choosing_action(message)
 
-    #else:
-    for i in range(0, 10):
-        if message.text == 'Матвей':
-            bot.send_message(message.chat.id, '@DrFobosser, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Дима':
-            bot.send_message(message.chat.id, '@RuFuZZZ, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Вова':
-            bot.send_message(message.chat.id, '@JustSenseSeeker, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Вася':
-            bot.send_message(message.chat.id, '@codemdvd, выйди на связь!', reply_markup=markup)
-        elif message.text == 'Прохор':
-            bot.send_message(message.chat.id, '@prokhorkotov, выйди на связь!', reply_markup=markup)
+    else:
+        for i in range(0, 10):
+            if message.text == 'Матвей':
+                bot.send_message(message.chat.id, '@DrFobosser, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Дима':
+                bot.send_message(message.chat.id, '@RuFuZZZ, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Вова':
+                bot.send_message(message.chat.id, '@JustSenseSeeker, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Вася':
+                bot.send_message(message.chat.id, '@codemdvd, выйди на связь!', reply_markup=markup)
+            elif message.text == 'Прохор':
+                bot.send_message(message.chat.id, '@prokhorkotov, выйди на связь!', reply_markup=markup)
 
 bot.polling(none_stop=True)
