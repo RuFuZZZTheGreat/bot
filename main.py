@@ -95,6 +95,7 @@ def spam_buttons(message):
                                       'Выбирай скорее!', reply_markup=markup)
 
 
+@bot.message_handler(content_types=['text'])
 def spam(message):
     markup = types.ReplyKeyboardMarkup()
     if message.text == 'Назад':
@@ -113,5 +114,15 @@ def spam(message):
                 bot.send_message(message.chat.id, '@codemdvd, выйди на связь!', reply_markup=markup)
             elif message.text == 'Прохор':
                 bot.send_message(message.chat.id, '@prokhorkotov, выйди на связь!', reply_markup=markup)
+    bot.register_next_step_handler(message,back)
+
+
+@bot.message_handler(content_types=['text'])
+def back(message):
+    markup = types.ReplyKeyboardMarkup()
+    if message.text == 'Назад':
+        message.text = 'Да'
+        choosing_action(message)
+
 
 bot.polling(none_stop=True)
