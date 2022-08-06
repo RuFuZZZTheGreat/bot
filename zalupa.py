@@ -15,16 +15,14 @@ def parser(url):
     anecdotes = soup.find_all('div', class_='text')
     return [c.text for c in anecdotes]
 
+list_of_jokes = parser(url)
+random.shuffle(list_of_jokes)
 
 def parser2(url2):
     r = requests.get(url)
     soup = b(r.text, 'html.parser')
     news = soup.find_all('span', class_='text')
     return [c.text for c in news]
-
-
-list_of_jokes = parser(url)
-random.shuffle(list_of_jokes)
 
 
 @bot.message_handler(commands=['start'])
@@ -43,7 +41,8 @@ def choosing_action(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
         joke = types.KeyboardButton('Анекдот')
         spamming = types.KeyboardButton('Спам')
-        markup.add(joke, spamming)
+        news = types.KeyboardButton('Новости')
+        markup.add(joke, spamming, news)
         bot.send_message(message.chat.id, 'Отлично! Выбирай, чем я тебе могу помочь!',
                          reply_markup=markup)
         bot.register_next_step_handler(message, two_actions)
@@ -60,6 +59,8 @@ def two_actions(message):
     elif message.text == 'Спам':
         spam_buttons(message)
         bot.register_next_step_handler(message, spam)
+    elif message.text == 'Новости':
+        news(message)
 
 
 @bot.message_handler(content_types=['text'])
@@ -134,6 +135,9 @@ def back(message):
 
 
 @bot.message_handler(content_types=['text'])
+def news(message):
+
+
 
 
 bot.polling(none_stop=True)
